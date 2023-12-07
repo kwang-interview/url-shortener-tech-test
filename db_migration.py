@@ -7,7 +7,7 @@ logger.info("Running migration...")
 dynamodb_client = boto3.client(
     'dynamodb',
     region_name='local',
-    endpoint_url="http://dynamodb-local:8000",
+    endpoint_url="http://dynamodb-local:9000",
     aws_access_key_id='access',
     aws_secret_access_key='secret',
     aws_session_token='token'
@@ -29,29 +29,25 @@ try:
             {
                 'AttributeName': 'urlId',
                 'KeyType': 'HASH',
-            },
-            {
-                'AttributeName': 'url',
-                'KeyType': 'RANGE',
-            },
+            }
         ],
-        LocalSecondaryIndexes=[
+        GlobalSecondaryIndexes=[
             {
                 'IndexName': 'urlIdx',
                 'KeySchema': [
                     {
-                        'AttributeName': 'urlId',
-                        'KeyType': 'HASH',
-                    },
-                    {
                         'AttributeName': 'url',
-                        'KeyType': 'RANGE'
+                        'KeyType': 'HASH'
                     }
                 ],
                 'Projection': {
                     'ProjectionType': 'ALL'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 5,
+                    'WriteCapacityUnits': 5,
                 }
-            }
+            },
         ],
         ProvisionedThroughput={
             'ReadCapacityUnits': 5,
