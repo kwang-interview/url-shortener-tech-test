@@ -7,7 +7,7 @@ from url_service import UrlService
 
 url_service = UrlService()
 
-
+# TODO: once clients are refactored, figure out mocking
 # class UrlServiceTest(unittest.TestCase):
 #     EXPECT_URL = "example.com/" + str(uuid.uuid4())
 #
