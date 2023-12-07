@@ -1,6 +1,7 @@
 from boto3.dynamodb.conditions import Key
 from fastapi import HTTPException
 
+import const
 from logger import get_logger
 import boto3
 import uuid
@@ -19,6 +20,7 @@ table = dynamodb.Table(table_name)
 logger = get_logger(__name__)
 
 
+# TODO: switch to interfaced usage
 class UrlService:
     def __init__(self):
         pass
@@ -45,34 +47,31 @@ class UrlService:
         # query always return list
         response = table.query(
             IndexName='urlIdx',
-            KeyConditionExpression=Key('url').eq(url)
+            KeyConditionExpression=Key(const.URL).eq(url)
         )
-        logger.debug(response)
-
         url_list = response.get("Items")
-        logger.debug(url_list)
 
         if len(url_list) == 0:
             raise HTTPException(status_code=404, detail="Url not found")
 
-        return url_list[0].get("urlId")
+        return url_list[0].get(const.URL_ID)
 
     @staticmethod
     def get_url_from_db(url_id: str) -> str:
         # get always return one
-        response = table.get_item(Key={"urlId": url_id})
+        response = table.get_item(Key={const.URL_ID: url_id})
         url = response.get("Item")
 
         if not url:
             raise HTTPException(status_code=404, detail="Url not found")
 
-        return url.get("url")
+        return url.get(const.URL)
 
     @staticmethod
     def save_url_to_db(url_id: str, url: str):
         table.put_item(
             Item={
-                "urlId": url_id,
-                "url": url,
+                const.URL_ID: url_id,
+                const.URL: url,
             }
         )

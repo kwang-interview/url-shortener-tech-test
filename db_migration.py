@@ -1,9 +1,13 @@
 import boto3
+
+import const
 from logger import get_logger
 
 logger = get_logger(__name__)
 
 logger.info("Running migration...")
+# TODO: move clients to standalone then have other classes reference it
+# TODO: configs to yaml
 dynamodb_client = boto3.client(
     'dynamodb',
     region_name='local',
@@ -17,17 +21,17 @@ try:
     response = dynamodb_client.create_table(
         AttributeDefinitions=[
             {
-                'AttributeName': 'urlId',
+                'AttributeName': const.URL_ID,
                 'AttributeType': 'S',
             },
             {
-                'AttributeName': 'url',
+                'AttributeName': const.URL,
                 'AttributeType': 'S',
             },
         ],
         KeySchema=[
             {
-                'AttributeName': 'urlId',
+                'AttributeName': const.URL_ID,
                 'KeyType': 'HASH',
             }
         ],
@@ -36,7 +40,7 @@ try:
                 'IndexName': 'urlIdx',
                 'KeySchema': [
                     {
-                        'AttributeName': 'url',
+                        'AttributeName': const.URL,
                         'KeyType': 'HASH'
                     }
                 ],
