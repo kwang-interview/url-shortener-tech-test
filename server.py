@@ -1,12 +1,19 @@
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
+
+from db_migration import Migration
+from dynamo_client import DynamoClient
 from url_service import UrlService
-import db_migration
 
 app = FastAPI()
 BASE_URL: str = "http://locahost:8080"
-url_service = UrlService()
+
+client = DynamoClient()
+migration = Migration(client)
+migration.migrate()
+
+url_service = UrlService(client)
 
 
 class ShortenRequest(BaseModel):
