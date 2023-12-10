@@ -5,7 +5,7 @@ from boto3.dynamodb.conditions import Key
 from fastapi import HTTPException
 
 import const
-from dynamo_client import DynamoClient
+from dynamo_client import TableClient
 from logger import get_logger
 
 logger = get_logger(__name__)
@@ -13,11 +13,10 @@ logger = get_logger(__name__)
 
 # TODO: switch to interfaced usage
 class UrlService:
-    table: Any
+    url_mapping_table: Any
 
-    def __init__(self, dynamo_client: DynamoClient):
-        table_name: str = "UrlMappingTable"
-        self.table = dynamo_client.client.Table(table_name)
+    def __init__(self, table_client: TableClient):
+        self.url_mapping_table = table_client.url_mapping
 
     def shorten_url(self, original_url: str) -> str:
         logger.debug("shortening...")
@@ -38,7 +37,7 @@ class UrlService:
 
     def get_id_from_db(self, url: str) -> str:
         # query always return list
-        response = self.table.query(
+        response = self.url_mapping_table.query(
             IndexName='urlIdx',
             KeyConditionExpression=Key(const.URL).eq(url)
         )
@@ -51,7 +50,7 @@ class UrlService:
 
     def get_url_from_db(self, url_id: str) -> str:
         # get always return one
-        response = self.table.get_item(Key={const.URL_ID: url_id})
+        response = self.url_mapping_table.get_item(Key={const.URL_ID: url_id})
         url = response.get("Item")
 
         if not url:
@@ -60,7 +59,7 @@ class UrlService:
         return url.get(const.URL)
 
     def save_url_to_db(self, url_id: str, url: str):
-        self.table.put_item(
+        self.url_mapping_table.put_item(
             Item={
                 const.URL_ID: url_id,
                 const.URL: url,

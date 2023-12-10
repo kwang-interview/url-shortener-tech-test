@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from db_migration import Migration
-from dynamo_client import DynamoClient
+from dynamo_client import DynamoClient, TableClient
 from url_service import UrlService
 
 app = FastAPI()
@@ -13,7 +13,8 @@ client = DynamoClient()
 migration = Migration(client)
 migration.migrate()
 
-url_service = UrlService(client)
+table = TableClient()
+url_service = UrlService(table)
 
 
 class ShortenRequest(BaseModel):
