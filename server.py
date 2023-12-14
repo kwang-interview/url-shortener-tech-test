@@ -7,7 +7,7 @@ from dynamo_client import DynamoClient, TableClient
 from url_service import UrlService
 
 app = FastAPI()
-BASE_URL: str = "http://locahost:8080"
+BASE_URL: str = "http://localhost:8000"
 
 client = DynamoClient()
 migration = Migration(client)
